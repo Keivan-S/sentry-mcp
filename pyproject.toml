@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sentry-mcp"
+version = "0.1.0"
+description = "Local MCP server that connects Claude Desktop / Claude Code straight to a self-hosted Sentry. No relay, no second LLM."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=2.2,<3",
+    "requests>=2.32",
+    "keyring>=25",
+    "truststore>=0.10",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+build = ["pyinstaller>=6.10"]
+
+[project.scripts]
+sentry-mcp = "sentry_mcp.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sentry_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

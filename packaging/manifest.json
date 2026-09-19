@@ -1,0 +1,73 @@
+{
+  "manifest_version": "0.3",
+  "name": "sentry-mcp",
+  "display_name": "Sentry (self-hosted)",
+  "version": "0.0.0",
+  "description": "Search, read and triage the issues of a self-hosted Sentry, directly over its API.",
+  "long_description": "Runs on your computer and talks straight to your own Sentry server, with no relay service and no second LLM in between. Issue search in Sentry's own syntax, full events with the crash point and your code's source lines first, tag breakdowns, Discover counts, releases, and triage: resolve, archive, assign, prioritise and comment. A read-only switch leaves the write tools out.",
+  "author": {
+    "name": "Keivan Sohrabloo"
+  },
+  "server": {
+    "type": "binary",
+    "entry_point": "server/sentry-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/server/sentry-mcp",
+      "args": ["serve"],
+      "env": {
+        "SENTRY_URL": "${user_config.url}",
+        "SENTRY_AUTH_TOKEN": "${user_config.token}",
+        "SENTRY_ORG": "${user_config.org}",
+        "SENTRY_READ_ONLY": "${user_config.read_only}"
+      }
+    }
+  },
+  "user_config": {
+    "url": {
+      "type": "string",
+      "title": "Sentry address",
+      "description": "The address you open Sentry at, e.g. https://sentry.company.com",
+      "required": true
+    },
+    "token": {
+      "type": "string",
+      "title": "Auth token",
+      "description": "A User Auth Token (User settings → Personal Tokens) with org:read, project:read, team:read, member:read, event:read and event:write.",
+      "sensitive": true,
+      "required": true
+    },
+    "org": {
+      "type": "string",
+      "title": "Organization slug (optional)",
+      "description": "Only needed when your account belongs to several organizations.",
+      "required": false,
+      "default": ""
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read-only",
+      "description": "Leaves out the tools that resolve, archive, assign and comment on issues.",
+      "required": false,
+      "default": false
+    }
+  },
+  "tools": [
+    { "name": "sentry_info", "description": "Connection check: token owner, scopes, organizations" },
+    { "name": "list_projects", "description": "Projects of the organization" },
+    { "name": "list_teams", "description": "Teams of the organization" },
+    { "name": "find_members", "description": "Organization members" },
+    { "name": "search_issues", "description": "Find issues with Sentry search syntax" },
+    { "name": "get_issue", "description": "One issue in full, with an event and its stack trace" },
+    { "name": "list_issue_events", "description": "Occurrences of an issue" },
+    { "name": "get_event", "description": "One event by id" },
+    { "name": "get_issue_tag_values", "description": "How an issue splits over a tag" },
+    { "name": "search_events", "description": "Discover counts and group-bys" },
+    { "name": "list_releases", "description": "Releases with new issues and deploys" },
+    { "name": "update_issues", "description": "Resolve, archive, reopen, assign, prioritise (unless read-only)" },
+    { "name": "add_issue_comment", "description": "Comment on an issue (unless read-only)" }
+  ],
+  "keywords": ["sentry", "self-hosted", "errors", "issues", "monitoring"],
+  "compatibility": {
+    "platforms": ["darwin", "win32"]
+  }
+}
